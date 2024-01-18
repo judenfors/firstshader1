@@ -8,7 +8,7 @@ Shader "Unlit/FirsShader"
     }
     SubShader
     {
-        Tags { "RenderType"="Transparent" }
+        Tags { "Queue"="Transparent" }
         LOD 100
         Blend SrcAlpha OneMinusSrcAlpha
         Pass
@@ -50,11 +50,15 @@ Shader "Unlit/FirsShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float2 uv = i.uv - 0.5;
+                float2 uv = i.uv;
+                uv *= 20;
+                uv = frac(uv) -0.5;
                 float d = length(uv);
-                float c = smoothstep(0.8,0.20,d);
-                float4 col = _Color;
-                return col *c;
+                d = step(d,0.3);
+
+                float brightnessMultiplier = sin(_Time.y *3) * 3;
+                float3 col = float3(d,d,d) * _Color.rgb * (_Brightness + brightnessMultiplier);
+                return float4(col,d);
             }
             ENDCG
         }
